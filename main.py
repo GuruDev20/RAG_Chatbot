@@ -48,6 +48,14 @@ def store_chunks_in_chromadb(chunks):
             ids=[f"chunk_{i}"]
         )
 
+def retrieve_relevant_chunks(query, top_k=3):
+    query_embedding = get_embeddings(query)
+    results = collection.query(
+        query_embeddings=[query_embedding],
+        n_results=top_k
+    )
+    return results["documents"][0]
+
 if __name__ == "__main__":
     folder_path = "Documents"
 
@@ -61,3 +69,14 @@ if __name__ == "__main__":
     print("Storing chunks in ChromaDB...")
     store_chunks_in_chromadb(text_chunks)
     print("All chunks stored successfully.")
+
+    print("\n--- RAG Retrieval Test ---")
+    user_query = input("Ask a question: ")
+
+    relevant_chunks = retrieve_relevant_chunks(user_query)
+
+    print("\nTop relevant chunks:\n")
+    for i, chunk in enumerate(relevant_chunks):
+        print(f"--- Chunk {i + 1} ---")
+        print(chunk)
+        print()
