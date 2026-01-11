@@ -21,11 +21,21 @@ def load_documents(folder_path):
             all_text += read_pdf(file_path) + "\n"
     return all_text
 
+def split_text(text,chunk_size=500):
+    chunks = []
+    for i in range(0, len(text), chunk_size):
+        chunks.append(text[i:i+chunk_size])
+    return chunks
+
 if __name__ == "__main__":
     folder_path = "Documents"
 
     print("Loading documents from folder:", folder_path)
     documents_text = load_documents(folder_path)
 
-    print("Combined Document Text:")
-    print(documents_text[:1000])
+    print("Splitting text into chunks...")
+    text_chunks = split_text(documents_text)
+    print(f"Total chunks created: {len(text_chunks)}")
+
+    for i, chunk in enumerate(text_chunks[:3]):
+        print(f"\n--- Chunk {i+1} ---\n{chunk}\n")
