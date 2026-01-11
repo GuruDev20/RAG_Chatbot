@@ -26,10 +26,14 @@ def load_documents(folder_path):
             all_text += read_pdf(file_path) + "\n"
     return all_text
 
-def split_text(text,chunk_size=500):
+def split_text(text, chunk_size=500, overlap=100):
     chunks = []
-    for i in range(0, len(text), chunk_size):
-        chunks.append(text[i:i+chunk_size])
+    start = 0
+    while start < len(text):
+        end = start + chunk_size
+        chunks.append(text[start:end])
+        start += chunk_size - overlap
+
     return chunks
 
 def get_embeddings(text):
@@ -48,7 +52,7 @@ def store_chunks_in_chromadb(chunks):
             ids=[f"chunk_{i}"]
         )
 
-def retrieve_relevant_chunks(query, top_k=3):
+def retrieve_relevant_chunks(query, top_k=5):
     query_embedding = get_embeddings(query)
     results = collection.query(
         query_embeddings=[query_embedding],
@@ -60,8 +64,12 @@ def generate_answer(query, context_chunks):
     context_text = "\n\n".join(context_chunks)
 
     prompt = f"""
-        You are a helpful assistant. Answer the question ONLY using the context below.
-        If the answer is not present in the context, say "I don't know".
+        You are an information extraction system.
+        Rules:
+        - Answer ONLY using the provided context
+        - Be concise and specific
+        - Do NOT add explanations
+        - If the answer is not explicitly stated, say "Not found in the documents"
 
         Context:
         {context_text}
@@ -69,7 +77,7 @@ def generate_answer(query, context_chunks):
         Question:
         {query}
 
-        Answer:
+        Answer (1-3 sentences max):
     """
 
     response = ollama.chat(
