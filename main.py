@@ -56,6 +56,30 @@ def retrieve_relevant_chunks(query, top_k=3):
     )
     return results["documents"][0]
 
+def generate_answer(query, context_chunks):
+    context_text = "\n\n".join(context_chunks)
+
+    prompt = f"""
+        You are a helpful assistant. Answer the question ONLY using the context below.
+        If the answer is not present in the context, say "I don't know".
+
+        Context:
+        {context_text}
+
+        Question:
+        {query}
+
+        Answer:
+    """
+
+    response = ollama.chat(
+        model="llama3",
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    return response["message"]["content"]
+
 if __name__ == "__main__":
     folder_path = "Documents"
 
@@ -70,13 +94,16 @@ if __name__ == "__main__":
     store_chunks_in_chromadb(text_chunks)
     print("All chunks stored successfully.")
 
-    print("\n--- RAG Retrieval Test ---")
-    user_query = input("Ask a question: ")
+    print("\nRAG Chatbot is ready! Type 'exit' to quit.\n")
 
-    relevant_chunks = retrieve_relevant_chunks(user_query)
+    while True:
+        user_query = input("You: ")
+        if user_query.lower() == "exit":
+            break
 
-    print("\nTop relevant chunks:\n")
-    for i, chunk in enumerate(relevant_chunks):
-        print(f"--- Chunk {i + 1} ---")
-        print(chunk)
-        print()
+        relevant_chunks = retrieve_relevant_chunks(user_query)
+        answer = generate_answer(user_query, relevant_chunks)
+
+        print("\nBot:")
+        print(answer)
+        print("-" * 50)
