@@ -1,0 +1,43 @@
+1. Code Quality
+
+Coding Standards:
+- Use Python 3.11
+- Follow clean architecture (controller, service, repository)
+- No global variables
+- All functions must have type hints
+- Use structured logging
+- No hardcoded secrets
+
+Using ONLY the standards above, create a REST API endpoint
+that creates a user and stores it in a database.
+
+Explain the design briefly.
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+2. SQL Generation
+
+Database Rules:
+- PostgreSQL
+- Tables: users(id, email), orders(id, user_id, amount, created_at)
+- DO NOT use SELECT *
+- Always use explicit JOINs
+- Use snake_case aliases
+
+Write a SQL query to get total order amount per user per month.
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+3. Infra Automation
+
+Infrastructure Rules:
+- Use Terraform
+- AWS only
+- No shell scripts
+- Must support rollback
+- Follow least privilege
+
+Create Terraform code to deploy an S3 bucket with versioning enabled
+and explain how rollback is handled.
+
+------------------------------------------------------------------------------------------------------------------------------------------------
